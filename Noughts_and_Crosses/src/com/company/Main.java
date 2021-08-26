@@ -13,13 +13,14 @@ public class Main {
                 board[i][j] = ' ';
 
         Random r = new Random();
-        int comp_move;
+        int comp_move = 0, player_move = 0;
         int[] board_position = new int[2];
 
         Scanner sc = new Scanner(System.in);
         System.out.println("Welcome to Tic-Tac-Toe!\nDo you want to be X or O?\n");
 
-        boolean win, play = true;
+        boolean win, play = true, valid_move = false;
+
         char computer, player = sc.next().toUpperCase().charAt(0);
         if (player == 'X') {
             computer = 'O';
@@ -32,15 +33,15 @@ public class Main {
         //decide whether player or computer goes first.
         while (play) {
             if (player == 'X') {
-                comp_move = all_moves.get(r.nextInt(all_moves.size()));
-                boardPosition(comp_move, board_position);
-                all_moves.remove((Integer) comp_move);
-                board[board_position[0]][board_position[1]] = 'O';
-
-                System.out.print("What is your next move? (1-9)");
+                computerMoves(comp_move, all_moves, r, board_position, board);
+                playerMoves(all_moves, r, board_position, board, valid_move, player_move, sc);
+            }
+            else {
+                playerMoves(all_moves, r, board_position, board, valid_move, player_move, sc);
+                computerMoves(comp_move, all_moves, r, board_position, board);
             }
             play = false;
-            printBoard(board);
+            //printBoard(board);
         }
     }
 
@@ -67,6 +68,35 @@ public class Main {
             board_position[1] = 2;
 
         board_position[0] = choice % 3;
+    }
+
+    public static void computerMoves (int comp_move, ArrayList<Integer> all_moves, Random r,
+                                  int[] board_position, char[][] board) {
+
+        comp_move = all_moves.get(r.nextInt(all_moves.size()));
+        boardPosition(comp_move, board_position);
+        all_moves.remove((Integer) comp_move);
+        board[board_position[1]][board_position[0]] = 'O';
+        printBoard(board);
+    }
+
+    public static void playerMoves (ArrayList<Integer> all_moves, Random r, int[] board_position,
+                                    char[][] board, boolean valid_move, int player_move, Scanner sc) {
+        while (!valid_move) {
+            System.out.println("What is your next move? (1-9)");
+            player_move = sc.nextInt() - 1;
+
+            if(all_moves.contains(player_move)) {
+                valid_move = true;
+                boardPosition(player_move, board_position);
+                all_moves.remove((Integer) player_move);
+                board[board_position[1]][board_position[0]] = 'X';
+                printBoard(board);
+            }
+            else {
+                System.out.print("Invalid Move! Try again!");
+            }
+        }
     }
 
     public static void checkValidMove () {
